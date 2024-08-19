@@ -1,5 +1,7 @@
 #!/usr/bin/env ruby
 
+VERSION = 0.1
+
 # pdfscan2djvu - Convert PDF files with scanned book pages to DjVu
 #
 # Written in 2024 by Siarhei Siamashka <siarhei.siamashka@gmail.com>
@@ -86,6 +88,9 @@ args = ARGV.filter do |arg|
 end
 
 unless args[0] && args[0] =~ /\.pdf$/i && File.exists?(args[0])
+  puts "pdfscan2djvu v#{VERSION} - interpret PDF as just a container of images (ignoring"
+  puts "                    everything else in it) and convert to DjVu."
+  puts
   puts "Usage: ruby pdfscan2djvu.rb [options] <input.pdf> [output.djvu]"
   puts "Where options can be:"
   puts "  -q[uality]=             : a line for the c44 tool's -slice option or one"
@@ -290,7 +295,7 @@ Dir.mktmpdir { |tmpdir|
   end
 
   djvused_txt = "set-meta; "
-  djvused_txt << "Producer \"pdfscan2djvu (https://github.com/ssvb/pdfscan2djvu)\"\n"
+  djvused_txt << "Producer \"pdfscan2djvu v#{VERSION} (https://github.com/ssvb/pdfscan2djvu)\"\n"
   djvused_txt << "pdfscan2djvu_pdf_name #{djvused_str(File.basename(inputfile))}\n"
   djvused_txt << "pdfscan2djvu_pdf_sha256 #{file_sha256(inputfile)}\n"
   optnum = 0
