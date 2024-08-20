@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-VERSION = 0.1
+VERSION = 0.2
 
 # pdfscan2djvu - Convert PDF files with scanned book pages to DjVu
 #
