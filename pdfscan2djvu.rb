@@ -174,11 +174,28 @@ printf("File information: %d pages. Average page size: %dx%d pixels.\n",
        data.map { |x| x[1][:h] }.sum / data.size)
 printf("Quality settings for c44 transcoding: '-slice %s'.\n", quality)
 
-# This is a base64 encoding of tiny DjVu file, containing the placeholder image
+# This is a base64 encoded small DjVu file, containing
+# the placeholder image. Using a public domain icon from
+#   https://openclipart.org/detail/282580/faq-icon
 placeholder_img = Base64.decode64("
-QVQmVEZPUk0AAAB4REpWVUlORk8AAAAKAdgBYBgAZAAWAVNqYnoAAABagEm3
-8jpegtEVy/X6afXF3nZqMaNrAfnToZdSuOjLitvnAQRd5WwyTWHA7lRT4x4X
-ILLYddSZ+E8NNCJ9eKAnQul8og195P0TSHbMAg6AKWfh6AI82UICBP8x")
+QVQmVEZPUk0AAAMRREpWVUlORk8AAAAKAZABkBgALAEWAVNqYnoAAALzgFu/
+aX6QwSWGMaKlDg/Kml9F8lCu4hjR2PMbkTl4CQPkH66fl59eI2bRH0TrP4bu
+I+5GK4tV0VfMSBD0mB2q3bsX8NF9FlkXoZzs+8oQWpLlriy1HxegCTl9WCd8
+YuhPFeYRFEkd270z9IKuasj/mmoynk5fGwBNBhQnfK3UNbt2eX7/caWTD4rN
+7VjTDQG/ISW8H8Vwz+URUq7qz/Q1UVkEa19WDDtLmGgDG0SwEi+Awbvu7wT4
+myP2/KdH7/+gNRKtt8JhzBii3No1tGxt4bbp/EUXxQ06hoHQcB+UJQzn5JDV
+PCdMHDjh5PGbhwAPDuH/TrBm6MO0cf+YPh9KKzIsfuoHpkGxTPf/hnc/VDkj
+IhUzSY/41bHC4/CwFkosswAP/ihZsy34KJ2kXiT6TBJvdyK0Toq8oCueHAZx
+t0M0VFA8FUrRf6YiljBQaqEOzo3Pifo3OFhwsjIZLGr41tdMn4rEu2RHOkIX
+5HU5DWnjoKBBHssTFinv24FY7DbII7V1Ww14ZI8qXnb3hxkaM6cxMRMKm0PS
+Co9esJIonF1SF1uHlPgjv6EudacKoAJlOf71jpPfEd+zyFqLrBYnF9/96Z2V
+E3tX6aEBJBeicwMkssvUjeC33OA5JSLulubnoSNXs4uST5YrRLwq2HGat361
+T38Z2b6C0NOGictYxwulheIu2UiIrvO8S9OSbJ27LJoXT4IEiLOGiVvZKWvZ
+xabJrGHUHQw2ZfqPjrCXyFfX9BFwzQVkFMh0NSmw9Dez3gYsPSBecyyOb8wC
+ql/wDZER6MtXLimCOEarnuFxfvY1mRqW3O7qVV9uw89BOaK0L86773It7fnr
+BI5sXfsEzNeyMozOvDio9gRJPKJmPVyjfguV2Gug1618HJczroeAQ0S1SZCM
+XgQQfEISJ/4EaZAR5NdogL5bK6u8SWunPfmmwVHLH3RtMoMJKlFjx4z2bGGB
+JDp5RAAzAdLefg8JINNbJs05sS3FNvaMP6Eo9cLdzp0=")
 
 Dir.mktmpdir { |tmpdir|
   tmp_prefix = File.join(tmpdir, "_")
