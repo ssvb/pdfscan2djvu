@@ -149,13 +149,14 @@ def parse_pdf_info(filename)
       w = a[3].to_i
       h = a[4].to_i
       color = a[5]
-      xdpi = a[12].to_i
-      ydpi = a[13].to_i
-      return nil, "unexpected dpi" unless xdpi == ydpi && xdpi > 0
+      dpi = [a[12].to_i, a[13].to_i].sort
+      if dpi[0] <= 0 || dpi[1].to_f / dpi[0] > 1.01
+        return nil, "unexpected dpi #{dpi} on page #{pdfpage}"
+      end
       return nil, "more than one image on a single page #{pdfpage}" if images.has_key?(pdfpage)
       color = "mono" if a[6].to_i == 1 && a[7].to_i == 1
       encformat = a[8]
-      images[pdfpage] = { color: color, w: w, h: h, dpi: xdpi, enc: encformat }
+      images[pdfpage] = { color: color, w: w, h: h, dpi: dpi[0], enc: encformat }
     end
     good = true if l =~ /^\s*page\s+num\s+type\s+width\s+height\s+color\s+comp\s+bpc\s+enc\s+interp\s+object\s+ID\s+x\-ppi\s+y\-ppi\s+size\s+ratio\s*$/
   end
