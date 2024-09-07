@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-VERSION = 0.2
+VERSION = 0.3
 
 # pdfscan2djvu - Convert PDF files with scanned book pages to DjVu
 #
@@ -31,6 +31,8 @@ quality_presets = { "bad" => "74,86,95",
                     "good" => "72,83,93,103",
                     "superb" => "74,89,99,111" }
 quality = quality_presets["good"]
+widthcap = nil
+magickfilter = ""
 
 # Other settings
 keep_jpegs = "auto"
@@ -72,6 +74,12 @@ args = ARGV.filter do |arg|
       end
     end
     nil
+  elsif arg =~ /^\-w(idthcap)?\=(\d+)$/
+    widthcap = $2.to_i
+    nil
+  elsif arg =~ /^\-f(ilter)?\=(\w+)$/
+    magickfilter = "-filter #{$2}"
+    nil
   elsif arg =~ /^\-j(pegs?)?(\=(auto(\:(0\.\d+))?|never|always))?$/
     if $5
       keep_jpegs = "auto"
@@ -96,6 +104,13 @@ unless args[0] && args[0] =~ /\.pdf$/i && File.exists?(args[0])
   puts "  -q[uality]=             : a line for the c44 tool's -slice option or one"
   puts "                            of the #{quality_presets.keys.join("/")} presets."
   puts "                            The default is 'good' (#{quality_presets["good"]})."
+  puts
+  puts "  -w[idthcap]=maxwidth    : automatically downscale excessively large images."
+  puts
+  puts "  -f[ilter]=              : apply ImageMagick filter. A good choice is 'Cubic',"
+  puts "                            and applying this filter before c44 compression"
+  puts "                            seems to have a positive effect (the compressed"
+  puts "                            images have better quality at smaller sizes)."
   puts
   puts "  -j[pegs]=[never|        : optionally take the original JPG images from the"
   puts "            always|         PDF file and transplant them to the generated"
@@ -269,8 +284,18 @@ Dir.mktmpdir { |tmpdir|
         progress_icon = "g"
         extraopt = "-crcbnone"
       end
-      `c44 -dpi #{page[1][:dpi]} -slice #{quality} #{extraopt} #{Shellwords.escape(tmp_ppm)} #{Shellwords.escape(tmp_djvu)}`
-      fail unless $?.exitstatus == 0
+
+      if widthcap && widthcap > 0 && page[1][:w] > widthcap
+        adjdpi = page[1][:dpi] * widthcap / page[1][:w]
+        `mogrify #{magickfilter} -resize #{widthcap} #{Shellwords.escape(tmp_ppm)}`
+        `c44 -dpi #{adjdpi} -slice #{quality} #{extraopt} #{Shellwords.escape(tmp_ppm)} #{Shellwords.escape(tmp_djvu)}`
+        fail unless $?.exitstatus == 0
+      else
+        `mogrify #{magickfilter} -resize 100% #{Shellwords.escape(tmp_ppm)}` if magickfilter != ""
+        `c44 -dpi #{page[1][:dpi]} -slice #{quality} #{extraopt} #{Shellwords.escape(tmp_ppm)} #{Shellwords.escape(tmp_djvu)}`
+        fail unless $?.exitstatus == 0
+      end
+
       if page[1][:enc] == "jpeg" && File.exists?(tmp_jpg)
         # Automatically keep JPG if we are not winning much in terms of file size.
         # Also keep all JPEGs if we were explicitly asked to do that.
